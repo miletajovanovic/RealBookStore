@@ -1,6 +1,7 @@
 package com.urosdragojevic.realbookstore.controller;
 
 import com.urosdragojevic.realbookstore.domain.Rating;
+import org.springframework.security.access.prepost.PreAuthorize;
 import com.urosdragojevic.realbookstore.repository.RatingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ public class RatingsController {
     }
 
     @PostMapping(value = "/ratings")
+    @PreAuthorize("hasAuthority('RATE_BOOK')")
     public String createOrUpdateRating(@ModelAttribute Rating rating) {
         rating.setUserId(1);
         ratingRepository.createOrUpdate(rating);
