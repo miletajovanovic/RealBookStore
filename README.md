@@ -1,5 +1,7 @@
 # Real Book Store
 
+[Report](https://docs.google.com/document/d/1eVr6LtaIspIsYnGI1XL5WYYIGxLnhCNUmAlky9M89j8/edit?usp=sharing)
+
 ###### Project assignment for Secure Software Development course 2023/2024
 
 ## Installation
