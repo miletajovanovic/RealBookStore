@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org xmlns:sec="http://www.thymeleaf.org/extras/spring-security""
 >
 <head>
     <meta charset="UTF-8">
@@ -29,10 +29,10 @@
 <body>
 <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" th:href="@{/books}">Real Book Store</a>
+        <a sec:authorize="hasAuthority('VIEW_BOOKS_LIST')" class="navbar-brand" th:href="@{/books}">Real Book Store</a>
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/books}">Books</a>
+                <a sec:authorize="hasAuthority('VIEW_BOOKS_LIST')" class="nav-link" th:href="@{/books}">Books</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/persons}">Users</a>
