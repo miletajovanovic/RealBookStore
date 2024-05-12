@@ -3,6 +3,7 @@ package com.urosdragojevic.realbookstore.controller;
 import com.urosdragojevic.realbookstore.audit.AuditLogger;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.urosdragojevic.realbookstore.domain.Person;
+import com.urosdragojevic.realbookstore.domain.Role;
 import com.urosdragojevic.realbookstore.domain.User;
 import com.urosdragojevic.realbookstore.repository.PersonRepository;
 import com.urosdragojevic.realbookstore.repository.RoleRepository;
@@ -29,10 +30,12 @@ public class PersonsController {
 
     private final PersonRepository personRepository;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
-    public PersonsController(PersonRepository personRepository, UserRepository userRepository) {
+    public PersonsController(PersonRepository personRepository, UserRepository userRepository, RoleRepository roleRepository) {
         this.personRepository = personRepository;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     @GetMapping("/persons/{id}")
@@ -61,9 +64,12 @@ public class PersonsController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User)authentication.getPrincipal();
 
-        if (user.getId() != id)
-        	throw new AccessDeniedException("Forbidden");
+        List<String> userRoles = roleRepository.findByUserId(user.getId()).stream().map(Role::getName).toList();
         
+        if ((userRoles.contains("MANAGER") || userRoles.contains("REVIEWER")) && id != user.getId()) {
+        	throw new AccessDeniedException("Forbidden");
+        }
+
         return ResponseEntity.noContent().build();
     }
 
@@ -78,10 +84,11 @@ public class PersonsController {
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User)authentication.getPrincipal();
-
-        // TODO: FIX this doesn't work, maybe the id in person and user are different things or sth like that
-//        if (Integer.toString(user.getId()) != person.getId())
-//        	throw new AccessDeniedException("Forbidden");
+        List<String> userRoles = roleRepository.findByUserId(user.getId()).stream().map(Role::getName).toList();
+        
+        if ((userRoles.contains("MANAGER") || userRoles.contains("REVIEWER")) && person.getId().equals(Integer.toString(user.getId()))) {
+        	throw new AccessDeniedException("Forbidden");
+        }
 
     	personRepository.update(person);
         return "redirect:/persons/" + person.getId();
