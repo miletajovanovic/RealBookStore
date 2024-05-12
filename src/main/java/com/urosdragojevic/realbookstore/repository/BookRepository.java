@@ -36,7 +36,7 @@ public class BookRepository {
                 bookList.add(book);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to get books", e);
         }
         return bookList;
     }
@@ -55,6 +55,9 @@ public class BookRepository {
                 bookList.add(createBookFromResultSet(rs));
             }
         }
+        catch (SQLException e) {
+            LOG.warn("Failed to get books for search query: " + searchTerm, e);
+        }
         return bookList;
     }
 
@@ -67,7 +70,7 @@ public class BookRepository {
                 return createBookFromResultSet(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+        	LOG.warn("Failed to get book for id: " + bookId, e);
         }
         return null;
     }
@@ -94,12 +97,14 @@ public class BookRepository {
                         statement2.setInt(2, genre.getId());
                         statement2.executeUpdate();
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        LOG.warn("User failed to add a book", e);
                     }
                 });
             }
+            auditLogger.audit("Added book " + book.toString());
         } catch (SQLException e) {
-            e.printStackTrace();
+        	auditLogger.audit("Failed to add book " + book.toString());
+        	LOG.warn("Failed to add book " + book, e);
         }
         return id;
     }
@@ -116,8 +121,11 @@ public class BookRepository {
             statement.executeUpdate(query2);
             statement.executeUpdate(query3);
             statement.executeUpdate(query4);
+        	auditLogger.audit("Deleted book with id" + bookId);
+
         } catch (SQLException e) {
-            e.printStackTrace();
+        	LOG.warn("Failed to delete a book with id: " + bookId, e);
+        	auditLogger.audit("Failed to delete book with id" + bookId);
         }
     }
 
